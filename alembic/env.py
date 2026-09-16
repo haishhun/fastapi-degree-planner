@@ -10,6 +10,19 @@ from alembic import context
 
 load_dotenv()
 # this is the Alembic Config object, which provides
+
+DATABASE_URL = os.getenv("POSTGRES_URL_NON_POOLING")
+
+if not DATABASE_URL:
+    raise ValueError("POSTGRES_URL_NON_POOLING is not set")
+
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgres://",
+        "postgresql://",
+        1,
+    )
+
 # access to the values within the .ini file in use.
 config = context.config
 
@@ -20,7 +33,8 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.models import Base
+from app.database import Base
+from app.models.user import User
 
 target_metadata = Base.metadata
 
@@ -42,7 +56,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = os.getenv("POSTGRES_URL_NON_POOLING")
+    url = DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -61,10 +75,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    config.set_main_option(
-        "sqlalchemy.url",
-        os.getenv("POSTGRES_URL_NON_POOLING")
-    )
+    config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
