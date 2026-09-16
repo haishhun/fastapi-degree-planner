@@ -25,3 +25,21 @@ class Course(Base):
     min_grade_required = Column(String, nullable=True)
 
     students = relationship("StudentCourse", back_populates="course")
+
+
+class EstGraduationEnum(enum.Enum):
+    spring_26 = "Spring 2026"
+    summer_26 = "Summer 2026"
+    fall_26 = "Fall 2026"
+    spring_27 = "Spring 2027"
+    summer_27 = "Summer 2027"
+    fall_27 = "Fall 2027"
+    spring_28 = "Spring 2028"
+    summer_28 = "Summer 2028"
+    fall_28 = "Fall 2028"
+    spring_29 = "Spring 2029"
+    summer_29 = "Summer 2029"
+    fall_29 = "Fall 2029"
+    spring_30 = "Spring 2030"
+    summer_30 = "Summer 2030"
+    fall_30 = "Fall 2030"
