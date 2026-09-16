@@ -12,7 +12,11 @@ if not DATABASE_URL:
     raise ValueError("POSTGRES_URL_NON_POOLING is not set")
 
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgres://",
+        "postgresql://",
+        1,
+    )
 
 engine = create_engine(DATABASE_URL, echo=True)
 

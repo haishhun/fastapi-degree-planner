@@ -26,6 +26,7 @@ def upgrade():
             existing_type=sa.VARCHAR(),
             type_=sa.LargeBinary(),
             existing_nullable=False,
+            postgresql_using="hashed_password::bytea",
         )
 
 
