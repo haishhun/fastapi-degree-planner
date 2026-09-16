@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_session
 from app.models import User, StudentCourse, StatusEnum, DegreeRequirement
+from app.models.course import EstGraduationEnum
 from app.routers.auth import get_current_user
 from app.schemas.stats import StatsPublic
 
@@ -12,8 +13,7 @@ router = APIRouter()
 
 @router.get("/", response_model=StatsPublic)
 def get_stats(
-    user: User = Depends(get_current_user),
-    session: Session = Depends(get_session)
+    user: User = Depends(get_current_user), session: Session = Depends(get_session)
 ) -> StatsPublic:
     completed_classes = (
         session.execute(
@@ -70,13 +70,20 @@ def get_stats(
         if "CSCI" in course.course.code:
             cs_credits_applied += course.credits_applied
 
-    degree_progress_pct = (credits_applied * 100) / credits_required
+    degree_progress_pct = round((credits_applied * 100) / credits_required)
     credits_remaining = credits_required - credits_applied
-    gpa_cumulative = total_grade / completed_credits if completed_credits else 0
-    gpa_cs_only = cs_grade / cs_completed_credits if cs_completed_credits else 0
+    if completed_credits:
+        gpa_cumulative = round(total_grade / completed_credits, 2)
+    else:
+        gpa_cumulative = 0
 
-    est_graduation = "Spring 2028"  # placeholder
-    cs_credits_required = 45  # placeholder
+    if cs_completed_credits:
+        gpa_cs_only = round(cs_grade / cs_completed_credits, 2)
+    else:
+        gpa_cs_only = 0
+
+    est_graduation = EstGraduationEnum.spring_28
+    cs_credits_required = 45
     cs_credits_remaining = cs_credits_required - cs_credits_applied
     liberal_arts_credits = credits_applied - cs_credits_applied
 
